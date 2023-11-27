@@ -69,7 +69,6 @@ public class UIController : MonoBehaviour {
     }
 
     private string GetAmmunitionText() {
-        Debug.Log("RUN");
         return _ammoUiText;
     }
 

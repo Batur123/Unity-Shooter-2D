@@ -10,14 +10,14 @@ public class Enemy : MonoBehaviour {
         _target = GameObject.FindGameObjectWithTag("Character").transform;
     }
     
-    void Update() {
+    private void Update() {
         if (_target) {
             MoveTowardsTarget();
         }
     }
 
-    void MoveTowardsTarget() {
-        Vector3 direction = (_target.position - transform.position).normalized;
+    private void MoveTowardsTarget() {
+        var direction = (_target.position - transform.position).normalized;
         transform.Translate(direction * moveSpeed * Time.deltaTime);
     }
 
@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour {
         if (health <= 0) KillEnemy();
     }
 
-    void KillEnemy() {
+    private void KillEnemy() {
         Destroy(gameObject);
     }
 }

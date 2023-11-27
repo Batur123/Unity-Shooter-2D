@@ -6,19 +6,34 @@ public class CharacterShooting : MonoBehaviour {
         RELOADING,
         READY,
     }
-   
+
+    private enum UpgradeState {
+        NOT_UPGRADED,
+        UPGRADED,
+    }
+    
+    private static Camera _mainCamera;
     public GameObject projectilePrefab;
     private WeaponState _weaponState = WeaponState.READY;
     private static int _maxAmmunition = 10;
     private static int _ammunition = 10;
+    private UpgradeState _upgradeState = UpgradeState.NOT_UPGRADED;
 
     private void Start() {
+        _mainCamera = Camera.main;
         UIController.instance.SetAmmunitionText(_ammunition, _maxAmmunition);
     }
 
     void Update() {
+        if (Input.GetKeyDown(KeyCode.U) && _upgradeState == UpgradeState.NOT_UPGRADED) {
+            _upgradeState = UpgradeState.UPGRADED;
+            Debug.Log("Ammunition upgraded.");
+            _maxAmmunition = 20;
+            UIController.instance.SetAmmunitionText(_ammunition,
+                _maxAmmunition);
+        }
+
         if (_weaponState == WeaponState.RELOADING) {
-            Debug.Log("Weapon is reloading, you cannot use weapon.");
             return;
         }
 
@@ -37,16 +52,13 @@ public class CharacterShooting : MonoBehaviour {
 
     IEnumerator ReloadAfterDelay(float delay) {
         yield return new WaitForSeconds(delay);
-        _ammunition = 10;
+        _ammunition = _maxAmmunition;
         _weaponState = WeaponState.READY;
         UIController.instance.SetAmmunitionText(_ammunition, _maxAmmunition);
     }
 
     void ShootProjectile() {
-        Vector2 targetPosition =
-            Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-        Vector2 shootDirection = targetPosition - (Vector2)transform.position;
+        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
 
         GameObject projectile = Instantiate(projectilePrefab,
             transform.position, Quaternion.identity);
