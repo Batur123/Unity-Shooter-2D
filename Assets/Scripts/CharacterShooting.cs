@@ -13,7 +13,6 @@ public class CharacterShooting : MonoBehaviour {
     private static int _ammunition = 10;
 
     private void Start() {
-        UIController.instance.CreateAmmoText();
         UIController.instance.SetAmmunitionText(_ammunition, _maxAmmunition);
     }
 

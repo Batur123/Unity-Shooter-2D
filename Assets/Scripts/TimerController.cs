@@ -7,7 +7,6 @@ public class TimerController : MonoBehaviour {
     public bool timerIsRunning = false;
 
     void Start() {
-        UIController.instance.CreateCountdown();
         UIController.instance.SetCountdownText($"Enemies are going to spawn in {Math.Round(countdown)}");
     }
 
