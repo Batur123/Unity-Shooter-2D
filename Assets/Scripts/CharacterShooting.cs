@@ -21,15 +21,25 @@ public class CharacterShooting : MonoBehaviour {
 
     private void Start() {
         _mainCamera = Camera.main;
-        UIController.instance.SetAmmunitionText(_ammunition, _maxAmmunition);
+        UIController.Instance.SetAmmunitionText(_ammunition, _maxAmmunition);
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.U) && _upgradeState == UpgradeState.NOT_UPGRADED) {
+        HandleInputs();
+    }
+
+    void HandleInputs() {
+        if (Input.GetKey(KeyCode.R) && _weaponState != WeaponState.RELOADING &&
+            _ammunition >= 0 && _ammunition != _maxAmmunition) {
+            Reload();
+        }
+
+        if (Input.GetKeyDown(KeyCode.U) &&
+            _upgradeState == UpgradeState.NOT_UPGRADED) {
             _upgradeState = UpgradeState.UPGRADED;
             Debug.Log("Ammunition upgraded.");
             _maxAmmunition = 20;
-            UIController.instance.SetAmmunitionText(_ammunition,
+            UIController.Instance.SetAmmunitionText(_ammunition,
                 _maxAmmunition);
         }
 
@@ -39,22 +49,27 @@ public class CharacterShooting : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0)) {
             if (_ammunition <= 0) {
-                UIController.instance.SetAmmunitionText("Reloading");
-                _weaponState = WeaponState.RELOADING;
-                StartCoroutine(ReloadAfterDelay(2f));
+                Reload();
             }
             else {
                 ShootProjectile();
-                UIController.instance.SetAmmunitionText(_ammunition, _maxAmmunition);
+                UIController.Instance.SetAmmunitionText(_ammunition,
+                    _maxAmmunition);
             }
         }
+    }
+
+    void Reload() {
+        UIController.Instance.SetAmmunitionText("Reloading");
+        _weaponState = WeaponState.RELOADING;
+        StartCoroutine(ReloadAfterDelay(2f));
     }
 
     IEnumerator ReloadAfterDelay(float delay) {
         yield return new WaitForSeconds(delay);
         _ammunition = _maxAmmunition;
         _weaponState = WeaponState.READY;
-        UIController.instance.SetAmmunitionText(_ammunition, _maxAmmunition);
+        UIController.Instance.SetAmmunitionText(_ammunition, _maxAmmunition);
     }
 
     void ShootProjectile() {

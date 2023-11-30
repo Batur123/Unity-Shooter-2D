@@ -5,8 +5,23 @@ public class EnemySpawner : MonoBehaviour {
     public GameObject enemyPrefab;
 
     public void Spawn() {
-        GameObject newEnemy = Instantiate(enemyPrefab,
+        GameObject newEnemyObj = Instantiate(enemyPrefab,
             GetRandomSpawnPosition(), Quaternion.identity);
+        Enemy newEnemy = newEnemyObj.GetComponent<Enemy>();
+
+        int randomNumber = Random.Range(1, 1001);
+        if (randomNumber <= 700) {
+            newEnemy.enemyType = EnemyTypes.BASIC_ZOMBIE;
+            Debug.Log("Basic zombie spawned");
+        }
+        else if (randomNumber <= 950) {
+            newEnemy.enemyType = EnemyTypes.RUNNER_ZOMBIE;
+            Debug.Log("Runner zombie spawned");
+        }
+        else {
+            newEnemy.enemyType = EnemyTypes.TANK_ZOMBIE;
+            Debug.Log("Tank zombie spawned");
+        }
     }
 
     Vector3 GetRandomSpawnPosition() {

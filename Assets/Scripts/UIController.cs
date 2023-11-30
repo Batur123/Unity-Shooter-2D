@@ -3,20 +3,30 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
-    public static UIController instance;
+    public static UIController Instance { get; private set; }
 
     private Text _ammoText;
     private string _ammoUiText;
+    
     private Text _countdownText;
     private string _countdownUiText;
+    
+    private Text _scoreBoardText;
+    private string _scoreBoardUiText;
+    
     private GameObject _canvasObject;
     private Canvas _canvas;
     
     private void Awake() {
         LoadUI();
-        if (!instance) {
-            Debug.Log("Instance created");
-            instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -48,6 +58,7 @@ public class UIController : MonoBehaviour {
         
         CreateCountdown();
         CreateAmmoText();
+        CreateScoreboardText();
     }
 
     private void LoadCanvas() {
@@ -90,6 +101,21 @@ public class UIController : MonoBehaviour {
     public void UpdateCountdownText() {
         if (_countdownText) {
             _countdownText.text = GetCountdownText();
+        }
+    }
+    
+    public void SetScoreBoardText(string text) {
+        _scoreBoardUiText = text;
+        UpdateScoreBoardText();
+    }
+
+    public string GetScoreBoardText() {
+        return _scoreBoardUiText;
+    }
+
+    public void UpdateScoreBoardText() {
+        if (_scoreBoardText) {
+            _scoreBoardText.text = GetScoreBoardText();
         }
     }
 
@@ -141,6 +167,26 @@ public class UIController : MonoBehaviour {
         rectTransform.anchorMax = new Vector2(1, 1);
         rectTransform.pivot = new Vector2(1, 1);
         rectTransform.anchoredPosition = new Vector2(-10, -10);
+    }
+    
+    private void CreateScoreboardText() {
+        GameObject ammoTextObject = new GameObject("ScoreboardText");
+        ammoTextObject.transform.SetParent(_canvasObject.transform);
+
+        _scoreBoardText = ammoTextObject.AddComponent<Text>();
+        _scoreBoardText.font = Resources.Load<Font>("Fonts/SampleFont");
+        _scoreBoardText.fontSize = 32;
+        _scoreBoardText.alignment = TextAnchor.UpperLeft;
+        _scoreBoardText.color = Color.black;
+        _scoreBoardText.text = GetAmmunitionText();
+        _ammoText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        _scoreBoardText.verticalOverflow = VerticalWrapMode.Truncate;
+        
+        RectTransform rectTransform = _scoreBoardText.GetComponent<RectTransform>();
+        rectTransform.anchorMin = new Vector2(0, 1);
+        rectTransform.anchorMax = new Vector2(0, 1);
+        rectTransform.pivot = new Vector2(0, 1);
+        rectTransform.anchoredPosition = new Vector2(10, -10);
     }
 
     private void CreateCountdown() {

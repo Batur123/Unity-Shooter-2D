@@ -7,13 +7,13 @@ public class TimerController : MonoBehaviour {
     public bool timerIsRunning = false;
 
     void Start() {
-        UIController.instance.SetCountdownText($"Enemies are going to spawn in {Math.Round(countdown)}");
+        UIController.Instance.SetCountdownText($"Enemies are going to spawn in {Math.Round(countdown)}");
     }
 
     void Update() {
         if (timerIsRunning) {
             if (countdown > 0) {
-                UIController.instance.SetCountdownText($"Enemies are going to spawn in {Math.Round(countdown)}");
+                UIController.Instance.SetCountdownText($"Enemies are going to spawn in {Math.Round(countdown)}");
                 countdown -= Time.deltaTime;
             }
             else {
@@ -21,7 +21,7 @@ public class TimerController : MonoBehaviour {
                     gameState.InitSpawn("SpawnEnemies", 0, 5);
                 }
 
-                UIController.instance.SetCountdownText("");
+                UIController.Instance.SetCountdownText("");
                 DestroyImmediate(gameObject);
             }
         }
