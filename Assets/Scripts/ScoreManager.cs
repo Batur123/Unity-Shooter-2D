@@ -1,37 +1,33 @@
 using System;
 using UnityEngine;
 
-public class ScoreManager : MonoBehaviour
-{
+public class ScoreManager : MonoBehaviour {
     public static ScoreManager Instance { get; private set; }
 
     private int _score = 0;
 
-    private void Awake()
-    {
-        if (Instance == null)
-        {
+    private void Awake() {
+        if (Instance == null) {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
-        {
+        else {
             Destroy(gameObject);
         }
     }
 
     private void Start() {
-        UIController.Instance.SetScoreBoardText($"Score: {_score}");
+        UIController.Instance.SetTextValue(UIController.TextType.SCOREBOARD_TEXT,
+            $"Score: {_score}");
     }
 
-    public void AddScore(int value)
-    {
+    public void AddScore(int value) {
         _score += value;
-        UIController.Instance.SetScoreBoardText($"Score: {_score}");
+        UIController.Instance.SetTextValue(UIController.TextType.SCOREBOARD_TEXT,
+            $"Score: {_score}");
     }
 
-    public int GetScore()
-    {
+    public int GetScore() {
         return _score;
     }
 }

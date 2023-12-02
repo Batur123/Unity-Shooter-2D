@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour {
     public int killScore;
 
     private static readonly Dictionary<EnemyTypes, EnemyConfig> Configs =
-        new Dictionary<EnemyTypes, EnemyConfig> {
+        new() {
             {
                 EnemyTypes.BASIC_ZOMBIE,
                 new EnemyConfig {

@@ -18,29 +18,32 @@ public class CharacterShooting : MonoBehaviour {
     private static int _maxAmmunition = 10;
     private static int _ammunition = 10;
     private UpgradeState _upgradeState = UpgradeState.NOT_UPGRADED;
+    public int damageAmount = 5;
 
     private void Start() {
         _mainCamera = Camera.main;
-        UIController.Instance.SetAmmunitionText(_ammunition, _maxAmmunition);
+        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
     }
 
     void Update() {
         HandleInputs();
     }
 
+    private string SetAmmoValue() {
+        return $"Ammo: {_ammunition}/{_maxAmmunition}";
+    }
+
     void HandleInputs() {
-        if (Input.GetKey(KeyCode.R) && _weaponState != WeaponState.RELOADING &&
-            _ammunition >= 0 && _ammunition != _maxAmmunition) {
+        if (Input.GetKey(KeyCode.R) && _weaponState != WeaponState.RELOADING && _ammunition >= 0 &&
+            _ammunition != _maxAmmunition) {
             Reload();
         }
 
-        if (Input.GetKeyDown(KeyCode.U) &&
-            _upgradeState == UpgradeState.NOT_UPGRADED) {
+        if (Input.GetKeyDown(KeyCode.U) && _upgradeState == UpgradeState.NOT_UPGRADED) {
             _upgradeState = UpgradeState.UPGRADED;
             Debug.Log("Ammunition upgraded.");
             _maxAmmunition = 20;
-            UIController.Instance.SetAmmunitionText(_ammunition,
-                _maxAmmunition);
+            UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
         }
 
         if (_weaponState == WeaponState.RELOADING) {
@@ -53,14 +56,13 @@ public class CharacterShooting : MonoBehaviour {
             }
             else {
                 ShootProjectile();
-                UIController.Instance.SetAmmunitionText(_ammunition,
-                    _maxAmmunition);
+                UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
             }
         }
     }
 
     void Reload() {
-        UIController.Instance.SetAmmunitionText("Reloading");
+        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, "Reloading");
         _weaponState = WeaponState.RELOADING;
         StartCoroutine(ReloadAfterDelay(2f));
     }
@@ -69,22 +71,21 @@ public class CharacterShooting : MonoBehaviour {
         yield return new WaitForSeconds(delay);
         _ammunition = _maxAmmunition;
         _weaponState = WeaponState.READY;
-        UIController.Instance.SetAmmunitionText(_ammunition, _maxAmmunition);
+        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
     }
 
     void Shotgun() {
         var bulletsPerShot = 3;
         var spreadAngle = 2.5f;
-        var shootDirection =
-            (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-            (Vector2)transform.position;
+        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
+                             (Vector2)transform.position;
 
         for (int i = 0; i < bulletsPerShot; i++) {
-            var bulletSpread = Quaternion.Euler(0, 0,
-                spreadAngle * (i - (bulletsPerShot - 1) / 2f));
-            
-            GameObject projectile = Instantiate(projectilePrefab,
-                transform.position, Quaternion.identity);
+            var bulletSpread =
+                Quaternion.Euler(0, 0, spreadAngle * (i - (bulletsPerShot - 1) / 2f));
+
+            GameObject projectile =
+                Instantiate(projectilePrefab, transform.position, Quaternion.identity);
             Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
 
             if (projectileRb) {
@@ -98,12 +99,11 @@ public class CharacterShooting : MonoBehaviour {
     }
 
     void Handgun() {
-        var shootDirection =
-            (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-            (Vector2)transform.position;
+        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
+                             (Vector2)transform.position;
 
-        GameObject projectile = Instantiate(projectilePrefab,
-            transform.position, Quaternion.identity);
+        GameObject projectile =
+            Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (projectileRb) {
             projectileRb.AddForce(shootDirection.normalized * 20f,
@@ -113,12 +113,11 @@ public class CharacterShooting : MonoBehaviour {
     }
 
     void ShootProjectile() {
-        var shootDirection =
-            (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-            (Vector2)transform.position;
+        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
+                             (Vector2)transform.position;
 
-        GameObject projectile = Instantiate(projectilePrefab,
-            transform.position, Quaternion.identity);
+        GameObject projectile =
+            Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (projectileRb) {
             projectileRb.AddForce(shootDirection.normalized * 20f,
