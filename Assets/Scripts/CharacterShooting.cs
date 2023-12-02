@@ -19,6 +19,8 @@ public class CharacterShooting : MonoBehaviour {
     private static int _ammunition = 10;
     private UpgradeState _upgradeState = UpgradeState.NOT_UPGRADED;
     public int damageAmount = 5;
+    public float fireRate = 0.1f;
+    public float nextShootTime = 0f;
 
     private void Start() {
         _mainCamera = Camera.main;
@@ -26,6 +28,7 @@ public class CharacterShooting : MonoBehaviour {
     }
 
     void Update() {
+        HandleRotation();
         HandleInputs();
     }
 
@@ -33,6 +36,15 @@ public class CharacterShooting : MonoBehaviour {
         return $"Ammo: {_ammunition}/{_maxAmmunition}";
     }
 
+    void HandleRotation() {
+        Vector2 weaponPosition = transform.position;
+        Vector2 mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        float angleRad = Mathf.Atan2(mousePosition.y - weaponPosition.y, mousePosition.x -
+            weaponPosition.x);
+        float angleDeg = (180 / Mathf.PI) * angleRad;
+        transform.rotation = Quaternion.Euler(0, 0, angleDeg);
+    }
+    
     void HandleInputs() {
         if (Input.GetKey(KeyCode.R) && _weaponState != WeaponState.RELOADING && _ammunition >= 0 &&
             _ammunition != _maxAmmunition) {
@@ -50,7 +62,9 @@ public class CharacterShooting : MonoBehaviour {
             return;
         }
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButton(0) && Time.time > nextShootTime ) {
+            nextShootTime = Time.time + fireRate;
+            
             if (_ammunition <= 0) {
                 Reload();
             }
@@ -106,7 +120,7 @@ public class CharacterShooting : MonoBehaviour {
             Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (projectileRb) {
-            projectileRb.AddForce(shootDirection.normalized * 20f,
+            projectileRb.AddForce(shootDirection.normalized * 30f,
                 ForceMode2D.Impulse);
             _ammunition -= 1;
         }
@@ -120,7 +134,7 @@ public class CharacterShooting : MonoBehaviour {
             Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (projectileRb) {
-            projectileRb.AddForce(shootDirection.normalized * 20f,
+            projectileRb.AddForce(shootDirection.normalized * 30f,
                 ForceMode2D.Impulse);
             _ammunition -= 1;
         }
