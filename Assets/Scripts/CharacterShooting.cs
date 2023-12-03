@@ -14,10 +14,13 @@ public class CharacterShooting : MonoBehaviour {
 
     private static Camera _mainCamera;
     public GameObject projectilePrefab;
+    
     private WeaponState _weaponState = WeaponState.READY;
+    private UpgradeState _upgradeState = UpgradeState.NOT_UPGRADED;
+    
     private static int _maxAmmunition = 10;
     private static int _ammunition = 10;
-    private UpgradeState _upgradeState = UpgradeState.NOT_UPGRADED;
+    
     public int damageAmount = 5;
     public float fireRate = 0.1f;
     public float nextShootTime = 0f;
