@@ -7,6 +7,7 @@ public class Character : MonoBehaviour {
 
     void Awake() {
         _rigidBody = GetComponent<Rigidbody2D>();
+        Physics2D.queriesStartInColliders = false;
     }
 
     void Update() {
