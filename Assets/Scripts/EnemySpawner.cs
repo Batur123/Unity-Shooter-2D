@@ -1,9 +1,14 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class EnemySpawner : MonoBehaviour {
     public Rigidbody2D player;
     public GameObject enemyPrefab;
     private readonly float _safeDistance = 5f;
+    [SerializeField]
+    public List<string> Enemies = new();
 
     public void Spawn() {
         GameObject newEnemyObj = Instantiate(enemyPrefab,
@@ -16,6 +21,9 @@ public class EnemySpawner : MonoBehaviour {
             <= 950 => EnemyTypes.RUNNER_ZOMBIE,
             _ => EnemyTypes.TANK_ZOMBIE
         };
+    
+        newEnemyObj.name = $"{newEnemy.enemyType.ToString()}";
+        Enemies.Add(newEnemyObj.GetInstanceID().ToString());
     }
 
     private Vector3 GetRandomSpawnPosition() {
