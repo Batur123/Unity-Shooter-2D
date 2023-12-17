@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: -1483028809879874405}
   - component: {fileID: -2493546891662946634}
   - component: {fileID: -3568024607706925798}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -207,4 +207,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 086d2e7442ada144db5daed5f2509d0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 0}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  enemyType: 0
   health: 20
+  baseHealth: 20
+  moveSpeed: 3
+  roamingRange: 5
+  baseKillScore: 1
+  killScore: 0

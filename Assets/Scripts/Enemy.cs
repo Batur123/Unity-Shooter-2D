@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,19 +15,31 @@ public struct EnemyConfig {
     public float speedModifier;
 }
 
+public enum EnemyState {
+    IDLE,
+    ROAMING,
+}
+
 public class Enemy : MonoBehaviour {
     public SpriteRenderer spriteRenderer;
+    private Transform _target;
+    public LayerMask obstacleMask;
 
     public EnemyTypes enemyType;
-
-    private Transform _target;
-
+    private EnemyState currentState;
+    
+    private Coroutine currentCoroutine;
+    
     public int health = 20;
     public int baseHealth = 20;
-    public float moveSpeed = 3f;
+    public float moveSpeed = 3f;    
+
+    public float roamingRange = 15f;
 
     public int baseKillScore = 1;
     public int killScore;
+
+    private Vector3 targetPosition;
 
     private static readonly Dictionary<EnemyTypes, EnemyConfig> Configs =
         new() {
@@ -62,22 +74,76 @@ public class Enemy : MonoBehaviour {
         killScore = baseKillScore + config.extraKillScore;
         health = baseHealth + config.healthModifier;
         moveSpeed += config.speedModifier;
+        SetState(EnemyState.IDLE);
+        //SetRandomTarget();
     }
 
-    private void Update() {
-        if (_target) {
-            MoveTowardsTarget();
+    void Update() {
+        switch (currentState) {
+            case EnemyState.ROAMING:
+                UpdateRoamingState();
+                break;
         }
     }
 
-    private void MoveTowardsTarget() {
-        var direction = (_target.position - transform.position).normalized;
-        transform.Translate(direction * (moveSpeed * Time.deltaTime));
+    private void SetState(EnemyState newState) {
+        currentState = newState;
+
+        switch (currentState) {
+            case EnemyState.IDLE:
+                StartCoroutine(SetStateAfterDelay(EnemyState.ROAMING, Random.Range(3f, 8f)));
+                break;
+            case EnemyState.ROAMING:
+                StartCoroutine(SetStateAfterDelay(EnemyState.IDLE, Random.Range(2f, 6f)));
+                break;
+        }
+    }
+
+    private void UpdateRoamingState() {
+        transform.position =
+            Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, targetPosition) < 0.1f) {
+            SetRandomTarget();
+        }
+
+        var origin = transform.position;
+        var direction = targetPosition - origin;
+        var distance = Vector3.Distance(origin, targetPosition);
+
+        RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance, obstacleMask);
+        Debug.DrawRay(origin, direction, spriteRenderer.color);
+
+        if (hit.collider != null) {
+            if (hit.collider.CompareTag("Enemy") && hit.collider.gameObject != gameObject) {
+                float enemyHitDistance = Vector3.Distance(hit.collider.gameObject.transform
+                    .position, gameObject.transform.position);
+
+                if (enemyHitDistance < 2f) {
+                    Debug.Log("Recalculate Route");
+                    SetRandomTarget();
+                }
+                
+                Debug.Log(
+                    $"Enemy detected. CurrentId:{gameObject.GetInstanceID()}, HitId:{hit.collider.gameObject.GetInstanceID()}, Distance:{enemyHitDistance}");
+            }
+        }
+    }
+    
+    private IEnumerator SetStateAfterDelay(EnemyState state, float delay) {
+        yield return new WaitForSeconds(delay);
+        SetState(state);
+    }
+
+    void SetRandomTarget() {
+        float randomX = Random.Range(-roamingRange, roamingRange);
+        float randomY = Random.Range(-roamingRange, roamingRange);
+        targetPosition = new Vector3(randomX, randomY, 0f);
     }
 
     public void TakeDamage(int damageAmount) {
         health -= damageAmount;
-        if (health <= 0) KillEnemy();
+        if (health <= 0) KillEnemy();   
     }
 
     private void KillEnemy() {
