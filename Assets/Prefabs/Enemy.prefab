@@ -219,11 +219,10 @@ MonoBehaviour:
   health: 20
   baseHealth: 20
   moveSpeed: 3
-  roamingRange: 5
+  roamingRange: 20
   baseKillScore: 1
   killScore: 0
-  coneAngle: 45
-  coneDistance: 5
+  distanceThreshold: 10
 --- !u!1 &5596788689200882331
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,6 +236,7 @@ GameObject:
   m_Layer: 6
   m_Name: Capsule
   m_TagString: Untagged
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
