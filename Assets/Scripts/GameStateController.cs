@@ -3,6 +3,7 @@ using UnityEngine;
 public class GameStateController : MonoBehaviour {
     public Transform player;
     public EnemySpawner spawner;
+    public int count = 0;
 
     public void InitSpawn(string methodName, float time, float repeatRate) {
         Debug.Log("Enemy spawn has been initialized");
@@ -16,5 +17,10 @@ public class GameStateController : MonoBehaviour {
 
     void SpawnEnemies() {
         spawner.Spawn();
+        count++;
+
+        if (count > 0) {
+            CancelInvoke("SpawnEnemies");
+        }
     }
 }

@@ -416,7 +416,7 @@ GameObject:
   - component: {fileID: 598846212}
   - component: {fileID: 598846214}
   - component: {fileID: 598846215}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Character
   m_TagString: Character
   m_Icon: {fileID: 0}
@@ -669,6 +669,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 598846212}
   enemyPrefab: {fileID: 4471977270975950620, guid: 1771b1e1ad6d83e45a2ccda33c3b2c78, type: 3}
+  Enemies: []
 --- !u!4 &2029944357
 Transform:
   m_ObjectHideFlags: 0
