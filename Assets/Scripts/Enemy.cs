@@ -25,25 +25,28 @@ public enum EnemyState {
 public class Enemy : MonoBehaviour {
     public SpriteRenderer spriteRenderer;
     private Transform _target;
+    
     public LayerMask obstacleMask;
     public LayerMask characterMask;
-
+    
     public EnemyTypes enemyType;
     private EnemyState _currentState;
-
+    
     private Coroutine _currentCoroutine;
-
+    private Coroutine _chaseTimeoutCoroutine;
+    
     public int health = 20;
     public int baseHealth = 20;
     public float moveSpeed = 3f;
-
-    public float roamingRange = 15f;
-
+    
+    private readonly float _roamingRange = 10f;
+    private readonly float _extendedRoamingRange = 30f;
+    private readonly float _rareCaseProbability = 0.03f; // 3% chance
+    
     public int baseKillScore = 1;
     public int killScore;
-
+    
     private Vector3 _targetPosition;
-
     public float distanceThreshold = 5f;
 
     private static readonly Dictionary<EnemyTypes, EnemyConfig> Configs =
@@ -80,13 +83,14 @@ public class Enemy : MonoBehaviour {
         killScore = baseKillScore + config.extraKillScore;
         health = baseHealth + config.healthModifier;
         moveSpeed += config.speedModifier;
+
+        SetRandomTarget();
         SetState(EnemyState.IDLE);
-        //SetRandomTarget();
     }
 
     void Update() {
         DetectEnemies();
-        
+
         switch (_currentState) {
             case EnemyState.ROAMING:
                 UpdateRoamingState();
@@ -107,17 +111,22 @@ public class Enemy : MonoBehaviour {
         }
 
         var direction = characterPos - enemyPos;
-        
+
         var dotProduct = Vector2.Dot(direction.normalized, transform.right);
-        
+
         if (dotProduct > 0.9f && (distance < distanceThreshold)) {
             Debug.DrawRay(enemyPos, direction, Color.yellow);
-            
-            if (_currentState == EnemyState.CHASING) {
-                return;
+
+            if (_currentState != EnemyState.CHASING) {
+                _currentState = EnemyState.CHASING;
+                RotateEnemyTowardsPlayer();
+
+                if (_chaseTimeoutCoroutine != null) {
+                    StopCoroutine(_chaseTimeoutCoroutine);
+                }
+
+                _chaseTimeoutCoroutine = StartCoroutine(ChaseTimeoutCoroutine());
             }
-            
-            SetState(EnemyState.CHASING);
         }
     }
 
@@ -125,7 +134,7 @@ public class Enemy : MonoBehaviour {
         if (_currentCoroutine != null) {
             StopCoroutine(_currentCoroutine); // Stop the previous coroutine
         }
-    
+
         _currentCoroutine = StartCoroutine(SetStateAfterDelay(newState));
     }
 
@@ -147,10 +156,23 @@ public class Enemy : MonoBehaviour {
         }
     }
 
+    private IEnumerator ChaseTimeoutCoroutine() {
+        if (_currentCoroutine != null) {
+            StopCoroutine(_currentCoroutine);
+        }
+
+        yield return new WaitForSeconds(Random.Range(8f, 11f));
+
+        // Transition back to IDLE state
+        _currentState = EnemyState.IDLE;
+        SetState(EnemyState.ROAMING);
+        _chaseTimeoutCoroutine = null;
+    }
+
     private void UpdateChasingState() {
-        Vector3 direction = (_target.position - transform.position).normalized;
+        transform.position = Vector3.MoveTowards(transform.position, _target.position, moveSpeed * Time
+            .deltaTime);
         RotateEnemyTowardsPlayer();
-        transform.Translate(direction * (moveSpeed * Time.deltaTime));
     }
 
     private void UpdateRoamingState() {
@@ -188,8 +210,8 @@ public class Enemy : MonoBehaviour {
 
     private IEnumerator SetStateAfterDelay(EnemyState state) {
         float delay = 0f;
-        
-        Debug.Log($"New {state} Current {_currentState}");
+
+        //Debug.Log($"New {state} Current {_currentState}");
 
         switch (state) {
             case EnemyState.IDLE:
@@ -220,9 +242,26 @@ public class Enemy : MonoBehaviour {
     }
 
     void SetRandomTarget() {
-        var randomX = Random.Range(-roamingRange, roamingRange);
-        var randomY = Random.Range(-roamingRange, roamingRange);
-        _targetPosition = new Vector3(randomX, randomY, 0f);
+        float randomX;
+        float randomY;
+
+        var rareCaseChance = Random.Range(0f, 1f);
+
+        switch (rareCaseChance < _rareCaseProbability) {
+            case true:
+                Debug.Log("Rare case roaming");
+                randomX = Random.Range(-_extendedRoamingRange, _extendedRoamingRange);
+                randomY = Random.Range(-_extendedRoamingRange, _extendedRoamingRange);
+                break;
+            case false:
+                randomX = Random.Range(-_roamingRange, _roamingRange);
+                randomY = Random.Range(-_roamingRange, _roamingRange);
+                break;
+        }
+
+        Vector2 currentPosition = transform.position;
+
+        _targetPosition = currentPosition + new Vector2(randomX, randomY);
     }
 
     public void TakeDamage(int damageAmount) {

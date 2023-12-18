@@ -20,7 +20,7 @@ public class TimerController : MonoBehaviour {
             }
             else {
                 if (gameState) {
-                    gameState.InitSpawn("SpawnEnemies", 0, 5);
+                    gameState.InitSpawn("SpawnEnemies", 0, 5f);
                 }
 
                 UIController.Instance.SetTextValue(UIController.TextType.COUNTDOWN_TEXT, "");

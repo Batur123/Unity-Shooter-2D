@@ -16,11 +16,12 @@ public class GameStateController : MonoBehaviour {
     }
 
     void SpawnEnemies() {
+        //count++;
         spawner.Spawn();
-        count++;
+        //Debug.Log($"Total Enemies: {count}");
 
-        if (count > 0) {
-            CancelInvoke("SpawnEnemies");
-        }
+         // if (count > 1000) {
+         //     CancelInvoke("SpawnEnemies");
+         // }
     }
 }
