@@ -21,6 +21,6 @@ public class Character : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        _rigidBody.MovePosition(_rigidBody.position + _movement * movementSpeed * Time.fixedDeltaTime);
+        _rigidBody.MovePosition(_rigidBody.position + (_movement * movementSpeed * Time.fixedDeltaTime));
     }
 }
