@@ -22,8 +22,6 @@ public class CharacterShooting : MonoBehaviour {
     private static int _ammunition = 10;
     
     public int damageAmount = 5;
-    public float fireRate = 0.1f;
-    public float nextShootTime = 0f;
 
     private void Start() {
         _mainCamera = Camera.main;
@@ -47,27 +45,36 @@ public class CharacterShooting : MonoBehaviour {
         float angleDeg = (180 / Mathf.PI) * angleRad;
         transform.rotation = Quaternion.Euler(0, 0, angleDeg);
     }
+
+    bool IsReloading() {
+        return _weaponState == WeaponState.RELOADING;
+    }
+    
+    bool CanReload() {
+        return Input.GetKey(KeyCode.R) && !IsReloading() && _ammunition >= 0 && _ammunition != _maxAmmunition;
+    }
+
+    bool CanUpgrade() {
+        return Input.GetKeyDown(KeyCode.U) && !IsReloading() && _upgradeState == UpgradeState.NOT_UPGRADED;
+    }
+    
     
     void HandleInputs() {
-        if (Input.GetKey(KeyCode.R) && _weaponState != WeaponState.RELOADING && _ammunition >= 0 &&
-            _ammunition != _maxAmmunition) {
+        if (CanReload()) {
             Reload();
         }
 
-        if (Input.GetKeyDown(KeyCode.U) && _upgradeState == UpgradeState.NOT_UPGRADED) {
+        if (CanUpgrade()) {
             _upgradeState = UpgradeState.UPGRADED;
-            Debug.Log("Ammunition upgraded.");
             _maxAmmunition = 20;
             UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
         }
 
-        if (_weaponState == WeaponState.RELOADING) {
+        if (IsReloading()) {
             return;
         }
 
-        if (Input.GetMouseButton(0) && Time.time > nextShootTime ) {
-            nextShootTime = Time.time + fireRate;
-            
+        if (Input.GetMouseButton(0)) {
             if (_ammunition <= 0) {
                 Reload();
             }
@@ -90,45 +97,7 @@ public class CharacterShooting : MonoBehaviour {
         _weaponState = WeaponState.READY;
         UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
     }
-
-    void Shotgun() {
-        var bulletsPerShot = 3;
-        var spreadAngle = 2.5f;
-        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-                             (Vector2)transform.position;
-
-        for (int i = 0; i < bulletsPerShot; i++) {
-            var bulletSpread =
-                Quaternion.Euler(0, 0, spreadAngle * (i - (bulletsPerShot - 1) / 2f));
-
-            GameObject projectile =
-                Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
-
-            if (projectileRb) {
-                projectileRb.AddForce(
-                    bulletSpread * shootDirection.normalized * 30f,
-                    ForceMode2D.Impulse);
-            }
-        }
-
-        _ammunition -= bulletsPerShot;
-    }
-
-    void Handgun() {
-        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-                             (Vector2)transform.position;
-
-        GameObject projectile =
-            Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-        Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
-        if (projectileRb) {
-            projectileRb.AddForce(shootDirection.normalized * 30f,
-                ForceMode2D.Impulse);
-            _ammunition -= 1;
-        }
-    }
-
+    
     void ShootProjectile() {
         var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
                              (Vector2)transform.position;
@@ -142,4 +111,42 @@ public class CharacterShooting : MonoBehaviour {
             _ammunition -= 1;
         }
     }
+
+    // void Shotgun() {
+    //     var bulletsPerShot = 3;
+    //     var spreadAngle = 2.5f;
+    //     var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
+    //                          (Vector2)transform.position;
+    //
+    //     for (int i = 0; i < bulletsPerShot; i++) {
+    //         var bulletSpread =
+    //             Quaternion.Euler(0, 0, spreadAngle * (i - (bulletsPerShot - 1) / 2f));
+    //
+    //         GameObject projectile =
+    //             Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+    //         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
+    //
+    //         if (projectileRb) {
+    //             projectileRb.AddForce(
+    //                 bulletSpread * shootDirection.normalized * 30f,
+    //                 ForceMode2D.Impulse);
+    //         }
+    //     }
+    //
+    //     _ammunition -= bulletsPerShot;
+    // }
+
+    // void Handgun() {
+    //     var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
+    //                          (Vector2)transform.position;
+    //
+    //     GameObject projectile =
+    //         Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+    //     Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
+    //     if (projectileRb) {
+    //         projectileRb.AddForce(shootDirection.normalized * 30f,
+    //             ForceMode2D.Impulse);
+    //         _ammunition -= 1;
+    //     }
+    // }
 }
