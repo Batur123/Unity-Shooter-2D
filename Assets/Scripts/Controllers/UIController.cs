@@ -12,11 +12,12 @@ public class UIController : MonoBehaviour {
     public enum TextType {
         AMMO_TEXT,
         COUNTDOWN_TEXT,
-        SCOREBOARD_TEXT
+        SCOREBOARD_TEXT,
+        INFO_TEXT,
     }
 
-    private GameObject _canvasObject;
-    private Canvas _canvas;
+    private GameObject _screenSpaceCanvasObject;
+    private Canvas _screenSpaceCanvas;
 
     private void Awake() {
         LoadUI();
@@ -30,7 +31,7 @@ public class UIController : MonoBehaviour {
     }
 
     private void LoadUI() {
-        LoadCanvas();
+        LoadScreenSpaceCanvas();
 
         CreateText(new TextSettings {
             Font = Resources.Load<Font>("Fonts/SampleFont"),
@@ -76,17 +77,32 @@ public class UIController : MonoBehaviour {
             AnchoredPosition = new Vector2(10, -10),
             GetTextValue = () => GetTextValue(TextType.SCOREBOARD_TEXT)
         }, "ScoreboardText");
+        
+        CreateText(new TextSettings {
+            Font = Resources.Load<Font>("Fonts/SampleFont"),
+            FontSize = 32,
+            Alignment = TextAnchor.MiddleCenter,
+            Color = Color.black,
+            HorizontalOverflow = HorizontalWrapMode.Overflow,
+            VerticalOverflow = VerticalWrapMode.Truncate,
+            TextType = TextType.INFO_TEXT,
+            AnchorMin = new Vector2(0.5f, 1f),
+            AnchorMax = new Vector2(0.5f, 1f),
+            Pivot = new Vector2(0.5f, 5f),
+            AnchoredPosition = new Vector2(0, 0),
+            GetTextValue = () => GetTextValue(TextType.INFO_TEXT)
+        }, "InfoMessage");
     }
 
-    private void LoadCanvas() {
-        _canvasObject = new GameObject("Canvas");
-        _canvas = _canvasObject.AddComponent<Canvas>();
-        _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        _canvasObject.AddComponent<CanvasScaler>();
-        _canvasObject.AddComponent<GraphicRaycaster>();
+    private void LoadScreenSpaceCanvas() {
+        _screenSpaceCanvasObject = new GameObject("ScreenSpaceCanvas");
+        _screenSpaceCanvas = _screenSpaceCanvasObject.AddComponent<Canvas>();
+        _screenSpaceCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        _screenSpaceCanvasObject.AddComponent<CanvasScaler>();
+        _screenSpaceCanvasObject.AddComponent<GraphicRaycaster>();
     }
 
-    private record TextSettings {
+    public record TextSettings {
         public Font Font;
         public int FontSize;
         public TextAnchor Alignment;
@@ -103,7 +119,7 @@ public class UIController : MonoBehaviour {
 
     private void CreateText(TextSettings settings, string gameObjectName) {
         var newGameObject = new GameObject(gameObjectName);
-        newGameObject.transform.SetParent(_canvasObject.transform);
+        newGameObject.transform.SetParent(_screenSpaceCanvasObject.transform);
 
         var newText = newGameObject.AddComponent<Text>();
         newText.font = settings.Font;

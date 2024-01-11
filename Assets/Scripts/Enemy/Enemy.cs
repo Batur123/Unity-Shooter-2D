@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public enum EnemyTypes {
     BASIC_ZOMBIE,
@@ -38,6 +40,10 @@ public class Enemy : MonoBehaviour {
     public int health = 20;
     public int baseHealth = 20;
     public float moveSpeed = 3f;
+    
+    public float attackRate = 1f; // Attacks per second
+    private float timeSinceLastAttack = 0f;
+    public int damageAmount = 10;
     
     private readonly float _roamingRange = 10f;
     private readonly float _extendedRoamingRange = 30f;
@@ -101,6 +107,24 @@ public class Enemy : MonoBehaviour {
         }
     }
 
+    private void OnTriggerStay2D(Collider2D other) {
+        if (other.CompareTag("Character"))
+        {
+            timeSinceLastAttack += Time.deltaTime;
+
+            // Check if it's time to attack
+            if (timeSinceLastAttack >= 1f)
+            {
+                Attack(other.gameObject);
+                timeSinceLastAttack = 0f; // Reset the timer
+            }
+        }
+    }
+
+    private void Attack(GameObject gameObject) {
+        Debug.Log($"Attacked to {gameObject.tag}");
+    }
+    
     private void DetectEnemies() {
         var enemyPos = transform.position;
         var characterPos = _target.position;

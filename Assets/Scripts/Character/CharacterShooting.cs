@@ -21,6 +21,9 @@ public class CharacterShooting : MonoBehaviour {
     private static int _maxAmmunition = 10;
     private static int _ammunition = 10;
     
+    public float fireRate = 0.1f;
+    public float nextShootTime = 0f;
+    
     public int damageAmount = 5;
 
     private void Start() {
@@ -74,7 +77,9 @@ public class CharacterShooting : MonoBehaviour {
             return;
         }
 
-        if (Input.GetMouseButton(0)) {
+        if (Input.GetMouseButton(0) && Time.time > nextShootTime) {
+            nextShootTime = Time.time + fireRate;
+            
             if (_ammunition <= 0) {
                 Reload();
             }
