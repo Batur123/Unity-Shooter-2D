@@ -14,6 +14,8 @@ public class UIController : MonoBehaviour {
         COUNTDOWN_TEXT,
         SCOREBOARD_TEXT,
         INFO_TEXT,
+        HEALTH_TEXT,
+        ARMOR_TEXT,
     }
 
     private GameObject _screenSpaceCanvasObject;
@@ -92,6 +94,36 @@ public class UIController : MonoBehaviour {
             AnchoredPosition = new Vector2(0, 0),
             GetTextValue = () => GetTextValue(TextType.INFO_TEXT)
         }, "InfoMessage");
+        
+        CreateText(new TextSettings {
+            Font = Resources.Load<Font>("Fonts/SampleFont"),
+            FontSize = 32,
+            Alignment = TextAnchor.UpperLeft,
+            Color = Color.black,
+            HorizontalOverflow = HorizontalWrapMode.Overflow,
+            VerticalOverflow = VerticalWrapMode.Truncate,
+            TextType = TextType.HEALTH_TEXT,
+            AnchorMin = new Vector2(0, 1),
+            AnchorMax = new Vector2(0, 1),
+            Pivot = new Vector2(0, 1.5f),
+            AnchoredPosition = new Vector2(10, -10),
+            GetTextValue = () => GetTextValue(TextType.HEALTH_TEXT)
+        }, "HealthText");
+        
+        CreateText(new TextSettings {
+            Font = Resources.Load<Font>("Fonts/SampleFont"),
+            FontSize = 32,
+            Alignment = TextAnchor.UpperLeft,
+            Color = Color.black,
+            HorizontalOverflow = HorizontalWrapMode.Overflow,
+            VerticalOverflow = VerticalWrapMode.Truncate,
+            TextType = TextType.ARMOR_TEXT,
+            AnchorMin = new Vector2(0, 1),
+            AnchorMax = new Vector2(0, 1),
+            Pivot = new Vector2(0, 2),
+            AnchoredPosition = new Vector2(10, -10),
+            GetTextValue = () => GetTextValue(TextType.ARMOR_TEXT)
+        }, "ArmorText");
     }
 
     private void LoadScreenSpaceCanvas() {

@@ -16,6 +16,7 @@ public struct EnemyConfig {
     public int extraKillScore;
     public int healthModifier;
     public float speedModifier;
+    public int damageModifier;
 }
 
 public enum EnemyState {
@@ -25,6 +26,7 @@ public enum EnemyState {
 }
 
 public class Enemy : MonoBehaviour {
+    public CharacterStats characterStats;
     public SpriteRenderer spriteRenderer;
     private Transform _target;
     
@@ -41,9 +43,11 @@ public class Enemy : MonoBehaviour {
     public int baseHealth = 20;
     public float moveSpeed = 3f;
     
+    public int baseDamageAmount = 5;
+    public int damageAmount;
+    
     public float attackRate = 1f; // Attacks per second
     private float timeSinceLastAttack = 0f;
-    public int damageAmount = 10;
     
     private readonly float _roamingRange = 10f;
     private readonly float _extendedRoamingRange = 30f;
@@ -58,27 +62,24 @@ public class Enemy : MonoBehaviour {
     private static readonly Dictionary<EnemyTypes, EnemyConfig> Configs =
         new() {
             {
-                EnemyTypes.BASIC_ZOMBIE,
-                new EnemyConfig {
-                    color = Color.red, extraKillScore = 0, healthModifier = 0,
-                    speedModifier = 0f
+                EnemyTypes.BASIC_ZOMBIE, new EnemyConfig {
+                    color = Color.red, extraKillScore = 0, healthModifier = 0, damageModifier = 0, speedModifier = 0f
                 }
             }, {
-                EnemyTypes.RUNNER_ZOMBIE,
-                new EnemyConfig {
-                    color = Color.green, extraKillScore = 2,
-                    healthModifier = -5, speedModifier = 2f
+                EnemyTypes.RUNNER_ZOMBIE, new EnemyConfig {
+                    color = Color.green, extraKillScore = 2, healthModifier = -5, damageModifier = -2, speedModifier = 2f
                 }
             }, {
-                EnemyTypes.TANK_ZOMBIE,
-                new EnemyConfig {
-                    color = Color.black, extraKillScore = 9,
-                    healthModifier = +30, speedModifier = -1f
+                EnemyTypes.TANK_ZOMBIE, new EnemyConfig {
+                    color = Color.black, extraKillScore = 9, healthModifier = +30, damageModifier = 15, speedModifier = -1f
                 }
             }
         };
 
     private void Start() {
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Character");
+        characterStats = playerObject.GetComponent<CharacterStats>();
+        
         obstacleMask = LayerMask.GetMask("Player", "Enemy");
         spriteRenderer = GetComponent<SpriteRenderer>();
         _target = GameObject.FindGameObjectWithTag("Character").transform;
@@ -89,6 +90,7 @@ public class Enemy : MonoBehaviour {
         killScore = baseKillScore + config.extraKillScore;
         health = baseHealth + config.healthModifier;
         moveSpeed += config.speedModifier;
+        damageAmount = baseDamageAmount + config.damageModifier;
 
         SetRandomTarget();
         SetState(EnemyState.IDLE);
@@ -115,14 +117,14 @@ public class Enemy : MonoBehaviour {
             // Check if it's time to attack
             if (timeSinceLastAttack >= 1f)
             {
-                Attack(other.gameObject);
+                Attack();
                 timeSinceLastAttack = 0f; // Reset the timer
             }
         }
     }
 
-    private void Attack(GameObject gameObject) {
-        Debug.Log($"Attacked to {gameObject.tag}");
+    private void Attack() {
+        characterStats.TakeDamage(damageAmount);
     }
     
     private void DetectEnemies() {
@@ -288,13 +290,25 @@ public class Enemy : MonoBehaviour {
         _targetPosition = currentPosition + new Vector2(randomX, randomY);
     }
 
-    public void TakeDamage(int damageAmount) {
-        health -= damageAmount;
+    private bool ShouldSpawnLoot() {
+        return Random.value <= 0.2f;
+    }
+
+    public void TakeDamage(int damage) {
+        health -= damage;
         if (health <= 0) KillEnemy();
     }
 
     private void KillEnemy() {
         ScoreManager.Instance.AddScore(killScore);
+
+        if (ShouldSpawnLoot()) {
+            Debug.Log("Spawn Loot");
+            GameObject spawnerObject = GameObject.FindGameObjectWithTag("Spawner");
+            LootSpawner lootSpawner = spawnerObject.GetComponent<LootSpawner>();
+            lootSpawner.SpawnRandomItem(transform.position);
+        }
+        
         Destroy(gameObject);
     }
 }

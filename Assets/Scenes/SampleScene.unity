@@ -309,9 +309,10 @@ GameObject:
   - component: {fileID: 323009013}
   - component: {fileID: 323009012}
   - component: {fileID: 323009014}
+  - component: {fileID: 323009015}
   m_Layer: 0
   m_Name: Spawner
-  m_TagString: Untagged
+  m_TagString: Spawner
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -358,8 +359,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ea246695a6a4f7097a2b0a9da83994b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lootManager: {fileID: 0}
   player: {fileID: 598846212}
-  lootBoxPrefab: {fileID: 5549726245421612000, guid: 1a7bfd75cac100e429ee889e09c96a2c, type: 3}
+--- !u!114 &323009015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323009011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d74a8286721e1594ebf6b42e19123992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,6 +492,7 @@ GameObject:
   - component: {fileID: 598846212}
   - component: {fileID: 598846214}
   - component: {fileID: 598846215}
+  - component: {fileID: 598846217}
   - component: {fileID: 598846216}
   m_Layer: 7
   m_Name: Character
@@ -656,6 +670,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &598846217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598846208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18bcc03a02e84aa8bd0273b83ef60228, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxHealth: 100
+  _maxArmor: 100
+  _health: 100
+  _armor: 100
 --- !u!1 &1152644832
 GameObject:
   m_ObjectHideFlags: 0
