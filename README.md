@@ -1,9 +1,10 @@
 # Simple Zombie Shooter Game
 
 - Zombie Types (Basic, Runner and Tank)
-- Shotgun and Handgun Weapons (HIGHLY EXPERIMENTAL)
-- Basic Zombie AI that move towards to the player
-- Scoreboard for upgrading weapons (WIP)
+- Basic Zombie AI that has IDLE ROAMING and CHASING states
+- Loot System
+- Health and Armor System
+- Scoreboard
 - Basic character movement
 
 ![image](https://github.com/Batur123/unity-shooter-2d/assets/32031460/3e4a6967-65d5-4a11-9757-43e6ce74d3d3)
