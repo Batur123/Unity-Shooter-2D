@@ -14,8 +14,7 @@ public class TimerController : MonoBehaviour {
     void Update() {
         if (timerIsRunning) {
             if (countdown > 0) {
-                UIController.Instance.SetTextValue(UIController.TextType.COUNTDOWN_TEXT,
-                    $"Enemies are going to spawn in {Math.Round(countdown)}");
+                UIController.Instance.SetTextValue(UIController.TextType.COUNTDOWN_TEXT, $"Enemies are going to spawn in {Math.Round(countdown)}");
                 countdown -= Time.deltaTime;
             }
             else {

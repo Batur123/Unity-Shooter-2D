@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 public enum EnemyTypes {
@@ -24,6 +25,8 @@ public enum EnemyState {
 }
 
 public class Enemy : MonoBehaviour {
+    public NavMeshAgent agent;
+    
     public CharacterStats characterStats;
     public SpriteRenderer spriteRenderer;
     private Transform _target;
@@ -75,6 +78,10 @@ public class Enemy : MonoBehaviour {
         };
 
     private void Start() {
+        agent = GetComponent<NavMeshAgent>();
+        agent.updateRotation = false;
+        agent.updateUpAxis = false;
+        
         GameObject playerObject = GameObject.FindGameObjectWithTag("Character");
         characterStats = playerObject.GetComponent<CharacterStats>();
         
@@ -88,6 +95,7 @@ public class Enemy : MonoBehaviour {
         killScore = baseKillScore + config.extraKillScore;
         health = baseHealth + config.healthModifier;
         moveSpeed += config.speedModifier;
+        agent.speed = moveSpeed;
         damageAmount = baseDamageAmount + config.damageModifier;
 
         SetRandomTarget();
@@ -95,16 +103,22 @@ public class Enemy : MonoBehaviour {
     }
 
     void Update() {
-        DetectEnemies();
-
-        switch (_currentState) {
-            case EnemyState.ROAMING:
-                UpdateRoamingState();
-                break;
-            case EnemyState.CHASING:
-                UpdateChasingState();
-                break;
+        agent.SetDestination(_target.position);
+        if (agent.hasPath) {
+            Vector2 lookDir = agent.velocity.normalized;
+            float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
+        //DetectEnemies();
+//
+        //switch (_currentState) {
+        //    case EnemyState.ROAMING:
+        //        UpdateRoamingState();
+        //        break;
+        //    case EnemyState.CHASING:
+        //        UpdateChasingState();
+        //        break;
+        //}
     }
 
     private void OnTriggerStay2D(Collider2D other) {
@@ -217,7 +231,10 @@ public class Enemy : MonoBehaviour {
         Debug.DrawRay(origin, direction, spriteRenderer.color);
 
         if (hit.collider != null) {
-            if (hit.collider.CompareTag("Enemy") && hit.collider.gameObject != gameObject) {
+            if (ShouldRecalculateRoute(hit.collider) && hit.collider.gameObject != gameObject) {
+                if (hit.collider.CompareTag("Structure")) {
+                    Debug.Log(hit.collider.tag);
+                }
                 float enemyHitDistance = Vector3.Distance(hit.collider.gameObject.transform
                     .position, gameObject.transform.position);
 
@@ -230,6 +247,10 @@ public class Enemy : MonoBehaviour {
                 //     $"Enemy detected. CurrentId:{gameObject.GetInstanceID()}, HitId:{hit.collider.gameObject.GetInstanceID()}, Distance:{enemyHitDistance}");
             }
         }
+    }
+
+    private bool ShouldRecalculateRoute(Collider2D collider2D) {
+        return collider2D.CompareTag("Enemy") || collider2D.CompareTag("Structure");
     }
 
     private IEnumerator SetStateAfterDelay(EnemyState state) {

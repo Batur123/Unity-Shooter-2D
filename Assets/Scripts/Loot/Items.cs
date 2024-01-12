@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
-public class Items {
+namespace Items {
+public class Item {
     public enum LootableItems {
         LOOT_BOX,
         MED_KIT,
@@ -29,8 +30,7 @@ public class Items {
         return ItemList;
     }
 
-    public static ItemAttributes GetItem(LootableItems item)
-    {
+    public static ItemAttributes GetItem(LootableItems item) {
         Dictionary<LootableItems, ItemAttributes> allItems = GetAllItems();
         return allItems.TryGetValue(item, out var outItem) ? outItem : null;
     }
@@ -38,4 +38,5 @@ public class Items {
     public static string GetItemName(LootableItems item) {
         return GetAllItems().TryGetValue(item, out var outItem) ? outItem.ItemName : item.ToString();
     }
+}
 }

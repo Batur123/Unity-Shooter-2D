@@ -1,3 +1,4 @@
+using Items;
 using UnityEngine;
 
 public class LootManager : MonoBehaviour {
@@ -8,8 +9,8 @@ public class LootManager : MonoBehaviour {
         return (T)values.GetValue(Random.Range(0, values.Length));
     }
 
-    public void SpawnItem(Items.LootableItems itemType, Vector3 spawnLocation) {
-        GameObject itemPrefab = Resources.Load<GameObject>($"{_lootPrefabsFolder}/{Items.GetItemName(itemType)}");
+    public void SpawnItem(Item.LootableItems itemType, Vector3 spawnLocation) {
+        GameObject itemPrefab = Resources.Load<GameObject>($"{_lootPrefabsFolder}/{Item.GetItemName(itemType)}");
         Instantiate(itemPrefab, spawnLocation, Quaternion.identity);
     }
 }

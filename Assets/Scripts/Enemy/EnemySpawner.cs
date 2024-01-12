@@ -12,8 +12,7 @@ public class EnemySpawner : MonoBehaviour {
     public List<string> Enemies = new();
 
     public void Spawn() {
-        GameObject newEnemyObj = Instantiate(enemyPrefab,
-            GetRandomSpawnPosition(), Quaternion.identity);
+        GameObject newEnemyObj = Instantiate(enemyPrefab, GetRandomSpawnPosition(), Quaternion.identity);
         Enemy newEnemy = newEnemyObj.GetComponent<Enemy>();
         Physics2D.IgnoreCollision(player.GetComponent<BoxCollider2D>(), newEnemyObj.GetComponent<CircleCollider2D>());
         var randomNumber = Random.Range(1, 1001);
@@ -32,9 +31,7 @@ public class EnemySpawner : MonoBehaviour {
         Vector3 spawnPosition;
 
         do {
-            spawnPosition =
-                new Vector3(Random.Range(playerPosition.x - 10f, playerPosition.x + 10f),
-                    Random.Range(playerPosition.y - 10f, playerPosition.y + 10f), 0f);
+            spawnPosition = new Vector3(Random.Range(playerPosition.x - 10f, playerPosition.x + 10f), Random.Range(playerPosition.y - 10f, playerPosition.y + 10f), 0f);
         } while (Vector3.Distance(playerPosition, spawnPosition) <= _safeDistance);
 
         return spawnPosition;
