@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -291,7 +289,7 @@ public class Enemy : MonoBehaviour {
     }
 
     private bool ShouldSpawnLoot() {
-        return Random.value <= 0.2f;
+        return Random.value <= 0.8f;
     }
 
     public void TakeDamage(int damage) {

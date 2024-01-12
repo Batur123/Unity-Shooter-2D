@@ -7,6 +7,7 @@ public class Searchable : MonoBehaviour {
     private bool IsPlayer(string colliderTag) {
         return colliderTag == "Character";
     }
+    
     private void OnTriggerEnter2D(Collider2D col) {
         if (IsPlayer(col.gameObject.tag)) {
             UIController.Instance.SetTextValue(UIController.TextType.INFO_TEXT, "Press E to Search");

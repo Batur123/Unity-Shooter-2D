@@ -1,5 +1,6 @@
 using UnityEngine;
 using Utils;
+
 public class LootSpawner : MonoBehaviour {
     public LootManager lootManager;
     public Rigidbody2D player;
@@ -12,11 +13,11 @@ public class LootSpawner : MonoBehaviour {
     }
 
     public void SpawnLootBox(Vector3 lootPosition) {
-        lootManager.SpawnItem(LootManager.LootableItems.LOOT_BOX, lootPosition);
+        lootManager.SpawnItem(Items.LootableItems.LOOT_BOX, lootPosition);
     }
     
     public void SpawnRandomItem(Vector3 lootPosition) {
-        LootManager.LootableItems randomItem = lootManager.GetRandomEnum<LootManager.LootableItems>();
+        Items.LootableItems randomItem = lootManager.GetRandomEnum<Items.LootableItems>();
         lootManager.SpawnItem(randomItem, lootPosition);
     }
 }

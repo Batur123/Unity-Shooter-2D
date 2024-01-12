@@ -52,7 +52,7 @@ public class CharacterStats : MonoBehaviour {
     
     private void Die() {
         Debug.Log("You are dead.");
-        // Need to handle unreference errors.
+        // Need to handle null pointer errors.
         this.GameObject().SetActive(false);
     }
 }
