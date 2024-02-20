@@ -14,8 +14,17 @@ public class ProjectileScript : MonoBehaviour {
     }
     
     private void OnTriggerEnter2D(Collider2D collision) {
-        if (_hasHit) return;
+        if (_hasHit) {
+            return;
+        }
 
+        // avoid bullet projectiles going through walls
+        if (collision.CompareTag("Structure")) {
+            _hasHit = true;
+            Destroy(gameObject);
+            return;
+        }
+        
         Enemy enemy = collision.GetComponent<Enemy>();
 
         if (enemy) {
@@ -24,7 +33,6 @@ public class ProjectileScript : MonoBehaviour {
             Destroy(gameObject);
         }
     }
-
 
     void Update() {
         _timer += Time.deltaTime;

@@ -23,6 +23,14 @@ public class CharacterStats : MonoBehaviour {
     public int GetArmor() {
         return _armor;
     }
+
+    public bool ShouldGiveHeal() {
+        return _maxHealth != _health;
+    }
+    
+    public bool ShouldGiveArmor() {
+        return _maxArmor != _armor;
+    }
     
     public void Heal(int healAmount) {
         _health += healAmount;

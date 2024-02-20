@@ -1,3 +1,4 @@
+using Items;
 using UnityEngine;
 using Utils;
 
@@ -13,11 +14,11 @@ public class LootSpawner : MonoBehaviour {
     }
 
     public void SpawnLootBox(Vector3 lootPosition) {
-        lootManager.SpawnItem(Items.LootableItems.LOOT_BOX, lootPosition);
+        lootManager.SpawnItem(Item.LootableItems.LOOT_BOX, lootPosition);
     }
     
     public void SpawnRandomItem(Vector3 lootPosition) {
-        Items.LootableItems randomItem = lootManager.GetRandomEnum<Items.LootableItems>();
+        Item.LootableItems randomItem = lootManager.GetRandomEnum<Item.LootableItems>();
         lootManager.SpawnItem(randomItem, lootPosition);
     }
 }

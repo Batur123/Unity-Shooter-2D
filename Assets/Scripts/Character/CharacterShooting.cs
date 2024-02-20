@@ -23,6 +23,7 @@ public class CharacterShooting : MonoBehaviour {
     
     public float fireRate = 0.1f;
     public float nextShootTime = 0f;
+    public float projectileSpeed = 50f;
     
     public int damageAmount = 5;
 
@@ -43,8 +44,7 @@ public class CharacterShooting : MonoBehaviour {
     void HandleRotation() {
         Vector2 weaponPosition = transform.position;
         Vector2 mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        float angleRad = Mathf.Atan2(mousePosition.y - weaponPosition.y, mousePosition.x -
-            weaponPosition.x);
+        float angleRad = Mathf.Atan2(mousePosition.y - weaponPosition.y, mousePosition.x - weaponPosition.x);
         float angleDeg = (180 / Mathf.PI) * angleRad;
         transform.rotation = Quaternion.Euler(0, 0, angleDeg);
     }
@@ -104,15 +104,12 @@ public class CharacterShooting : MonoBehaviour {
     }
     
     void ShootProjectile() {
-        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-                             (Vector2)transform.position;
-
-        GameObject projectile =
-            Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
+        Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg);
+        GameObject projectile = Instantiate(projectilePrefab, transform.position, rotation);
         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
         if (projectileRb) {
-            projectileRb.AddForce(shootDirection.normalized * 30f,
-                ForceMode2D.Impulse);
+            projectileRb.AddForce(shootDirection.normalized * projectileSpeed, ForceMode2D.Impulse);
             _ammunition -= 1;
         }
     }
