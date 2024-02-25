@@ -2613,10 +2613,11 @@ GameObject:
   - component: {fileID: 598846211}
   - component: {fileID: 598846210}
   - component: {fileID: 598846212}
+  - component: {fileID: 598846216}
   - component: {fileID: 598846214}
   - component: {fileID: 598846215}
   - component: {fileID: 598846217}
-  - component: {fileID: 598846216}
+  - component: {fileID: 598846218}
   m_Layer: 7
   m_Name: Character
   m_TagString: Character
@@ -2810,6 +2811,19 @@ MonoBehaviour:
   _maxArmor: 100
   _health: 100
   _armor: 100
+--- !u!114 &598846218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598846208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af26a38ce0c2e1443b711bf3a358ecee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  availableWeapons: []
 --- !u!1 &613174848
 GameObject:
   m_ObjectHideFlags: 0

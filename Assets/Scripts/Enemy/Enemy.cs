@@ -175,13 +175,11 @@ public class Enemy : MonoBehaviour {
     }
 
     private void UpdateIdleState() {
-        // Implement behavior for the IDLE state here
+        return;
     }
 
     private void UpdateRoamingState() {
-        // Implement behavior for the ROAMING state here
         if (!agent.hasPath) {
-            // Set a random destination for roaming
             Vector3 randomDestination = GetRandomPointInWorld();
             agent.SetDestination(randomDestination);
         }

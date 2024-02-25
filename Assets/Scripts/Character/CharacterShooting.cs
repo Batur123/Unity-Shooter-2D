@@ -12,6 +12,13 @@ public class CharacterShooting : MonoBehaviour {
         UPGRADED,
     }
 
+    private enum EquippedWeapon {
+        PISTOL,
+        SHOTGUN,
+    }
+    private WeaponManager weaponManager;
+    private Weapon currentWeapon;
+
     private static Camera _mainCamera;
     public GameObject projectilePrefab;
     
@@ -27,9 +34,17 @@ public class CharacterShooting : MonoBehaviour {
     
     public int damageAmount = 5;
 
+    private EquippedWeapon _currentWeapon;
+
     private void Start() {
+        weaponManager = GetComponent<WeaponManager>();
         _mainCamera = Camera.main;
         UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
+        _currentWeapon = EquippedWeapon.PISTOL;
+        
+        currentWeapon = GetComponent<Pistol>();
+        
+        UIController.Instance.SetTextValue(UIController.TextType.WEAPON_TEXT, "Equipped: Pistol");
     }
 
     void Update() {
@@ -63,6 +78,11 @@ public class CharacterShooting : MonoBehaviour {
     
     
     void HandleInputs() {
+        if (Input.GetKey(KeyCode.Alpha1) && _currentWeapon != EquippedWeapon.SHOTGUN) {
+            _currentWeapon = EquippedWeapon.SHOTGUN;
+            UIController.Instance.SetTextValue(UIController.TextType.WEAPON_TEXT, "Equipped: Shotgun");
+        }
+        
         if (CanReload()) {
             Reload();
         }
@@ -77,16 +97,9 @@ public class CharacterShooting : MonoBehaviour {
             return;
         }
 
-        if (Input.GetMouseButton(0) && Time.time > nextShootTime) {
-            nextShootTime = Time.time + fireRate;
-            
-            if (_ammunition <= 0) {
-                Reload();
-            }
-            else {
-                ShootProjectile();
-                UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
-            }
+        if (Input.GetMouseButtonDown(0))
+        {
+            weaponManager.FireCurrentWeapon();
         }
     }
 
@@ -102,53 +115,4 @@ public class CharacterShooting : MonoBehaviour {
         _weaponState = WeaponState.READY;
         UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, SetAmmoValue());
     }
-    
-    void ShootProjectile() {
-        var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) - (Vector2)transform.position;
-        Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg);
-        GameObject projectile = Instantiate(projectilePrefab, transform.position, rotation);
-        Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
-        if (projectileRb) {
-            projectileRb.AddForce(shootDirection.normalized * projectileSpeed, ForceMode2D.Impulse);
-            _ammunition -= 1;
-        }
-    }
-
-    // void Shotgun() {
-    //     var bulletsPerShot = 3;
-    //     var spreadAngle = 2.5f;
-    //     var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-    //                          (Vector2)transform.position;
-    //
-    //     for (int i = 0; i < bulletsPerShot; i++) {
-    //         var bulletSpread =
-    //             Quaternion.Euler(0, 0, spreadAngle * (i - (bulletsPerShot - 1) / 2f));
-    //
-    //         GameObject projectile =
-    //             Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-    //         Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
-    //
-    //         if (projectileRb) {
-    //             projectileRb.AddForce(
-    //                 bulletSpread * shootDirection.normalized * 30f,
-    //                 ForceMode2D.Impulse);
-    //         }
-    //     }
-    //
-    //     _ammunition -= bulletsPerShot;
-    // }
-
-    // void Handgun() {
-    //     var shootDirection = (Vector2)_mainCamera.ScreenToWorldPoint(Input.mousePosition) -
-    //                          (Vector2)transform.position;
-    //
-    //     GameObject projectile =
-    //         Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-    //     Rigidbody2D projectileRb = projectile.GetComponent<Rigidbody2D>();
-    //     if (projectileRb) {
-    //         projectileRb.AddForce(shootDirection.normalized * 30f,
-    //             ForceMode2D.Impulse);
-    //         _ammunition -= 1;
-    //     }
-    // }
 }

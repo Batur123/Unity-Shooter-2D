@@ -16,6 +16,7 @@ public class UIController : MonoBehaviour {
         INFO_TEXT,
         HEALTH_TEXT,
         ARMOR_TEXT,
+        WEAPON_TEXT,
     }
 
     private GameObject _screenSpaceCanvasObject;
@@ -124,6 +125,21 @@ public class UIController : MonoBehaviour {
             AnchoredPosition = new Vector2(10, -10),
             GetTextValue = () => GetTextValue(TextType.ARMOR_TEXT)
         }, "ArmorText");
+        
+        CreateText(new TextSettings {
+            Font = Resources.Load<Font>("Fonts/SampleFont"),
+            FontSize = 32,
+            Alignment = TextAnchor.UpperLeft,
+            Color = Color.black,
+            HorizontalOverflow = HorizontalWrapMode.Overflow,
+            VerticalOverflow = VerticalWrapMode.Truncate,
+            TextType = TextType.WEAPON_TEXT,
+            AnchorMin = new Vector2(0, 1),
+            AnchorMax = new Vector2(0, 1),
+            Pivot = new Vector2(0, 2.5f),
+            AnchoredPosition = new Vector2(10, -10),
+            GetTextValue = () => GetTextValue(TextType.WEAPON_TEXT)
+        }, "WeaponText");
     }
 
     private void LoadScreenSpaceCanvas() {
