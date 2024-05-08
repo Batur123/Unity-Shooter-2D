@@ -1,8 +1,17 @@
+using System;
 using UnityEngine;
 using Items;
+using Unity.VisualScripting;
 
 public class Lootable : MonoBehaviour {
     [SerializeField] public Item.LootableItems lootableItem;
+    public CharacterStats characterStats;
+    public Character character;
+
+    private void Awake() {
+        characterStats = gameObject.AddComponent<CharacterStats>();
+        character = gameObject.AddComponent<Character>();
+    }
 
     void OnTriggerEnter2D(Collider2D col) {
         if (col.CompareTag("Character")) {
@@ -16,8 +25,6 @@ public class Lootable : MonoBehaviour {
         if (item == null) {
             Destroy(gameObject);
         }
-
-        CharacterStats characterStats = player.GetComponent<CharacterStats>();
 
         switch (item.EffectType) {
             case Item.EffectType.HEALTH:
