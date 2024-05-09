@@ -1,7 +1,5 @@
-using System;
 using UnityEngine;
 using Items;
-using Unity.VisualScripting;
 
 public class Lootable : MonoBehaviour {
     [SerializeField] public Item.LootableItems lootableItem;

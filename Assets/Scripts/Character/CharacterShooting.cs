@@ -12,73 +12,78 @@ public class CharacterShooting : MonoBehaviour {
         NOT_UPGRADED,
         UPGRADED,
     }
-    
+
     private IWeapon _currentWeapon;
     private Dictionary<KeyCode, IWeapon> _weapons;
-    
+
+    private IEnumerator _reloadRoutine;
+    private Dictionary<IWeapon, Coroutine> _reloadRoutines = new Dictionary<IWeapon, Coroutine>();
+
     private static Camera _mainCamera;
     public GameObject projectilePrefab;
-    
+
     private WeaponState _weaponState = WeaponState.READY;
     private UpgradeState _upgradeState = UpgradeState.NOT_UPGRADED;
-    
+
     private static int _maxAmmunition = 10;
     private static int _ammunition = 10;
-    
-    public float fireRate = 0.1f;
-    public float nextShootTime = 0f;
+
+    public float nextShootTime;
     public float projectileSpeed = 50f;
-    
+
     public int damageAmount = 5;
 
     private void Start() {
         _mainCamera = Camera.main;
-        
         _weapons = new Dictionary<KeyCode, IWeapon> {
-            {KeyCode.Alpha1, new Pistol()},
-            {KeyCode.Alpha2, new Shotgun()},
+            { KeyCode.Alpha1, new Pistol() },
+            { KeyCode.Alpha2, new Shotgun() },
         };
         _currentWeapon = _weapons[KeyCode.Alpha1]; // default weapon
-        
-        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, 
-            $"Ammo: {_currentWeapon.Ammunition}");
+
+        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT,
+            $"[{_currentWeapon.Name}] - Ammo: {_currentWeapon.Ammunition}");
     }
 
     void Update() {
         HandleRotation();
 
-        foreach (var weapon in _weapons)
-        {
-            if (Input.GetKeyDown(weapon.Key))
-            {
+        foreach (var weapon in _weapons) {
+            if (Input.GetKeyDown(weapon.Key) && _currentWeapon != weapon.Value) {
+                if (_currentWeapon.IsReloading && _reloadRoutines.ContainsKey(_currentWeapon)) {
+                    StopCoroutine(_reloadRoutines[_currentWeapon]);
+                    _reloadRoutines.Remove(_currentWeapon);
+                    _currentWeapon.IsReloading = false;
+                }
+
                 _currentWeapon = weapon.Value;
-                UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, 
-                    $"Ammo: {_currentWeapon.Ammunition}");
+                UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT,
+                    $"[{_currentWeapon.Name}] - Ammo: {_currentWeapon.Ammunition}");
             }
         }
-        
-        if (Input.GetMouseButton(0) && Time.time > nextShootTime && !_currentWeapon.IsReloading)
-        {
-            Debug.Log("Ammunition: " + _currentWeapon.Ammunition);
-            Debug.Log("IsReloading: " + _currentWeapon.IsReloading);
 
-            
-            nextShootTime = Time.time + fireRate;
+        if (CanReload(_currentWeapon)) {
+            _reloadRoutines[_currentWeapon] = StartCoroutine(Reload(_currentWeapon));
+        }
+
+        if (Input.GetMouseButton(0) && Time.time > nextShootTime && !_currentWeapon.IsReloading) {
+            nextShootTime = Time.time + _currentWeapon.ShootDelay;
             Vector2 shootDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
             _currentWeapon.Shoot(shootDirection, transform.position, projectilePrefab, projectileSpeed);
-            // If out of ammo, start reloading. Make sure the reload coroutine runs only once
-            if (_currentWeapon.Ammunition <= 0 && !_currentWeapon.IsReloading)
-            { Debug.Log("Not Reloading. Starting Reload Coroutine.");
-                StartCoroutine(Reload(_currentWeapon)); // removed 2f reloadTime, as it's inside weapon now
-            }
-            else {
-                Debug.Log("Already Reloading");
-            }
 
-            // Update the ammunition count for the current weapon
-            UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT, 
-                $"Ammo: {_currentWeapon.Ammunition}");
+            if (_currentWeapon.Ammunition <= 0 && !_currentWeapon.IsReloading) {
+                _reloadRoutines[_currentWeapon] = StartCoroutine(Reload(_currentWeapon));
+            }
         }
+    }
+
+    bool CanReload(IWeapon weapon) {
+        if (_currentWeapon == null) {
+            return false;
+        }
+
+        return Input.GetKey(KeyCode.R) && !weapon.IsReloading && weapon.Ammunition >= 0 && weapon.Ammunition != weapon
+            .MaxAmmunition;
     }
 
     void HandleRotation() {
@@ -89,14 +94,17 @@ public class CharacterShooting : MonoBehaviour {
         transform.rotation = Quaternion.Euler(0, 0, angleDeg);
     }
 
-    IEnumerator Reload(IWeapon weapon)
-    {
-        Debug.Log($"Reloading {weapon.Name}");
+    IEnumerator Reload(IWeapon weapon) {
         weapon.IsReloading = true;
+        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT,
+            $"[{_currentWeapon.Name}] - Reloading");
         yield return new WaitForSeconds(weapon.ReloadTime);
-        Debug.Log($"Reloaded {weapon.Name}");
-    
-        weapon.Ammunition = 10; // Restock ammo
+        weapon.Ammunition = weapon.MaxAmmunition;
         weapon.IsReloading = false;
+        UIController.Instance.SetTextValue(UIController.TextType.AMMO_TEXT,
+            $"[{_currentWeapon.Name}] - Ammo: {weapon.Ammunition}");
+        if (_reloadRoutines.ContainsKey(weapon)) {
+            _reloadRoutines.Remove(weapon);
+        }
     }
 }
