@@ -33,6 +33,7 @@ public class Enemy : MonoBehaviour {
 
     public EnemyTypes enemyType;
     private EnemyState _currentState;
+    private Coroutine _currentCoroutine = null;
 
     public int health = 20;
     public int baseHealth = 20;
@@ -123,16 +124,20 @@ public class Enemy : MonoBehaviour {
     }
 
     private void SetState(EnemyState newState) {
+        if(_currentCoroutine != null) {
+            StopCoroutine(_currentCoroutine);
+        }
+
         _currentState = newState;
         switch (_currentState) {
             case EnemyState.IDLE:
-                StartCoroutine(SetStateAfterDelay(EnemyState.ROAMING, Random.Range(4f, 8f)));
+                _currentCoroutine = StartCoroutine(SetStateAfterDelay(EnemyState.ROAMING, Random.Range(4f, 8f)));
                 break;
             case EnemyState.ROAMING:
-                StartCoroutine(SetStateAfterDelay(EnemyState.IDLE, 3f));
+                _currentCoroutine = StartCoroutine(SetStateAfterDelay(EnemyState.IDLE, 3f));
                 break;
             case EnemyState.CHASING:
-                StartCoroutine(SetStateAfterDelay(EnemyState.ROAMING, 10f));
+                _currentCoroutine = StartCoroutine(SetStateAfterDelay(EnemyState.ROAMING, 10f));
                 break;
         }
     }
@@ -165,12 +170,19 @@ public class Enemy : MonoBehaviour {
     }
 
     private void RotateEnemyTowardsPlayer() {
-        if (_currentState == EnemyState.CHASING) {
-            var direction = (_target.position - transform.position).normalized;
+        var enemyPos = transform.position;
+        var characterPos = _target.position;
+        var distance = Vector2.Distance(enemyPos, characterPos);
+
+        if (IsPlayerVisible(enemyPos, characterPos, distance)) {
+            var direction = (characterPos - transform.position).normalized;
             if (direction != Vector3.zero) {
                 var rotateAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.AngleAxis(rotateAngle, Vector3.forward);
             }
+        }
+        else {
+            RotateEnemy();
         }
     }
 
@@ -193,26 +205,33 @@ public class Enemy : MonoBehaviour {
         var enemyPos = transform.position;
         var characterPos = _target.position;
         var distance = Vector2.Distance(enemyPos, characterPos);
-
-        var direction = characterPos - enemyPos;
-        var dotProduct = Vector2.Dot(direction.normalized, transform.right);
-
-        if (dotProduct > 0.9f && (distance < distanceThreshold)) {
-            Debug.DrawRay(enemyPos, direction, Color.yellow);
-
+        
+        if (IsPlayerVisible(enemyPos, characterPos, distance)) {
             agent.SetDestination(characterPos);
             _hiddenTime = 0f;
+            Debug.DrawRay(enemyPos, (characterPos - enemyPos), Color.yellow);
         }
         else {
             _hiddenTime += Time.deltaTime;
+            agent.SetDestination(characterPos);
 
             if (_hiddenTime >= Random.Range(7f, 11f)) {
                 SetState(EnemyState.ROAMING);
             }
-            else {
-                agent.SetDestination(characterPos);
-            }
         }
+    }
+    
+    private bool IsPlayerVisible(Vector2 enemyPos, Vector2 characterPos, float distance) {
+        var direction = (characterPos - enemyPos).normalized;
+        var dotProduct = Vector2.Dot(direction, transform.right);
+  
+        return dotProduct > 0.9f && (distance < distanceThreshold) && !IsObstructed(enemyPos, direction, distance);
+    }
+
+    private bool IsObstructed(Vector2 origin, Vector2 direction, float distance) {
+        RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance);
+  
+        return hit.collider != null && hit.collider.CompareTag("Structure");
     }
 
     private IEnumerator SetStateAfterDelay(EnemyState state, float delay) {

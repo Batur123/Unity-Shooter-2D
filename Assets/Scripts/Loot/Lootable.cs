@@ -16,9 +16,9 @@ public class Lootable : MonoBehaviour {
         if (item == null) {
             Destroy(gameObject);
         }
-
+        
         CharacterStats characterStats = player.GetComponent<CharacterStats>();
-
+        
         switch (item.EffectType) {
             case Item.EffectType.HEALTH:
                 if (characterStats.ShouldGiveHeal()) {

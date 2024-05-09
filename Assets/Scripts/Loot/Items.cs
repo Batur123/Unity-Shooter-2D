@@ -5,7 +5,8 @@ public class Item {
     public enum LootableItems {
         LOOT_BOX,
         MED_KIT,
-        ARMOR_KIT
+        ARMOR_KIT,
+        CORN_SEED,
     }
 
     public enum EffectType {
